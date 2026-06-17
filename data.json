@@ -1,0 +1,5 @@
+[
+  { "plan": "PP-1001", "tissue": "Leaf", "total": 20, "prepared": 8 },
+  { "plan": "PP-1001", "tissue": "Root", "total": 15, "prepared": 6 },
+  { "plan": "PP-1002", "tissue": "Leaf", "total": 30, "prepared": 12 }
+]
