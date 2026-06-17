@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sample Preparation Tracker</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --success: #16a34a;
+      --shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 34px;
+      letter-spacing: -0.03em;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .section-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      margin-top: 18px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 15px;
+      outline: none;
+      background: #fff;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--primary);
+      color: white;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+    }
+
+    button.secondary {
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    button.secondary:hover {
+      background: #cbd5e1;
+    }
+
+    button.danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    button.danger:hover {
+      background: #fee2e2;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .stat {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .stat .value {
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .progress-wrap {
+      margin-top: 18px;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .progress-track {
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+      border-radius: 999px;
+      transition: width 0.2s ease;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tissue-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .tissue-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .tissue-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .plan-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .empty {
+      border: 1px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 22px;
+      text-align: center;
+      color: var(--muted);
+      background: #f8fafc;
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 800px) {
+      .toolbar,
+      .stats,
+      .tissue-grid,
+      .form-grid,
+      .plan-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .button-row,
+      .footer-actions {
+        justify-content: stretch;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="container">
+      <header class="header">
+        <h1>Sample Preparation Tracker</h1>
+        <p>Track sample preparation progress by production plan and tissue type.</p>
+      </header>
+
+      <section class="card">
+        <div class="toolbar">
+          <div>
+            <label for="planId">Production Plan Number</label>
+            <input id="planId" type="text" placeholder="Production Plan ID" />
+          </div>
+          <div class="button-row">
+            <button class="secondary" onclick="previousPlan()">Previous</button>
+            <button class="secondary" onclick="nextPlan()">Next</button>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="label">Total Samples</div>
+            <div class="value" id="totalSamples">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">Prepared Samples</div>
+            <div class="value" id="preparedSamples">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">Progress</div>
+            <div class="value" id="overallProgress">0%</div>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span id="summaryText">0 / 0 prepared</span>
+            <span id="summaryPercent">0% complete</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-bar" id="overallProgressBar"></div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-title">
+            <h2>Tissue Type Breakdown</h2>
+            <span class="muted" id="tissueCount">0 tissue types</span>
+          </div>
+          <div class="tissue-list" id="tissueList"></div>
+        </div>
+
+        <div class="section-card">
+          <h2>Add Tissue Type</h2>
+          <div class="form-grid">
+            <div>
+              <label for="newTissueType">Tissue Type</label>
+              <input id="newTissueType" type="text" placeholder="e.g., Leaf, Root, Seed" />
+            </div>
+            <div>
+              <label for="newTissueTotal">Total Samples</label>
+              <input id="newTissueTotal" type="number" min="0" placeholder="0" />
+            </div>
+            <div>
+              <label for="newTissuePrepared">Prepared</label>
+              <input id="newTissuePrepared" type="number" min="0" placeholder="0" />
+            </div>
+            <button onclick="addTissueType()">Add Tissue</button>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h2>Add Production Plan</h2>
+          <div class="plan-grid">
+            <div>
+              <label for="newPlanId">New Production Plan Number</label>
+              <input id="newPlanId" type="text" placeholder="New Plan ID" />
+            </div>
+            <button onclick="addPlan()">Add Plan</button>
+          </div>
+        </div>
+
+        <div class="footer-actions">
+          <button class="secondary" onclick="exportData()">Export Data</button>
+          <button class="danger" onclick="resetData()">Reset Demo Data</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "samplePreparationTrackerData";
+
+    const demoPlans = [
+      {
+        id: "PP-1001",
+        tissues: [
+          { type: "Leaf", total: 20, prepared: 8 },
+          { type: "Root", total: 15, prepared: 6 },
+          { type: "Seed", total: 15, prepared: 6 }
+        ]
+      },
+      {
+        id: "PP-1002",
+        tissues: [
+          { type: "Leaf", total: 30, prepared: 12 },
+          { type: "Stem", total: 25, prepared: 10 },
+          { type: "Root", total: 25, prepared: 13 }
+        ]
+      },
+      {
+        id: "PP-1003",
+        tissues: [
+          { type: "Leaf", total: 25, prepared: 25 },
+          { type: "Seed", total: 35, prepared: 35 }
+        ]
+      }
+    ];
+
+    let plans = loadPlans();
+    let currentIndex = 0;
+
+    function loadPlans() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return structuredClone(demoPlans);
+
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) && parsed.length ? parsed : structuredClone(demoPlans);
+      } catch {
+        return structuredClone(demoPlans);
+      }
+    }
+
+    function savePlans() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(plans));
+    }
+
+    function getCurrentPlan() {
+      if (!plans.length) {
+        plans = [{ id: "New Plan", tissues: [] }];
+        currentIndex = 0;
+      }
+      return plans[currentIndex];
+    }
+
+    function calculateTotals(plan) {
+      const total = plan.tissues.reduce((sum, tissue) => sum + Number(tissue.total || 0), 0);
+      const prepared = plan.tissues.reduce((sum, tissue) => sum + Number(tissue.prepared || 0), 0);
+      const percent = total ? Math.round((prepared / total) * 100) : 0;
+      return { total, prepared, percent };
+    }
+
+    function clampPrepared(tissue) {
+      tissue.total = Math.max(0, parseInt(tissue.total, 10) || 0);
+      tissue.prepared = Math.max(0, parseInt(tissue.prepared, 10) || 0);
+      tissue.prepared = Math.min(tissue.prepared, tissue.total);
+    }
+
+    function render() {
+      const plan = getCurrentPlan();
+      const totals = calculateTotals(plan);
+
+      document.getElementById("planId").value = plan.id;
+      document.getElementById("totalSamples").textContent = totals.total;
+      document.getElementById("preparedSamples").textContent = totals.prepared;
+      document.getElementById("overallProgress").textContent = `${totals.percent}%`;
+      document.getElementById("summaryText").textContent = `${totals.prepared} / ${totals.total} prepared`;
+      document.getElementById("summaryPercent").textContent = `${totals.percent}% complete`;
+      document.getElementById("overallProgressBar").style.width = `${totals.percent}%`;
+      document.getElementById("tissueCount").textContent = `${plan.tissues.length} tissue type${plan.tissues.length === 1 ? "" : "s"}`;
+
+      const tissueList = document.getElementById("tissueList");
+      tissueList.innerHTML = "";
+
+      if (!plan.tissues.length) {
+        tissueList.innerHTML = `<div class="empty">No tissue types added yet. Add one below to start tracking this production plan.</div>`;
+        savePlans();
+        return;
+      }
+
+      plan.tissues.forEach((tissue, index) => {
+        clampPrepared(tissue);
+        const tissuePercent = tissue.total ? Math.round((tissue.prepared / tissue.total) * 100) : 0;
+
+        const card = document.createElement("div");
+        card.className = "tissue-card";
+        card.innerHTML = `
+          <div class="tissue-grid">
+            <div>
+              <label>Tissue Type</label>
+              <input type="text" value="${escapeHtml(tissue.type)}" oninput="updateTissue(${index}, 'type', this.value)" />
+            </div>
+            <div>
+              <label>Total</label>
+              <input type="number" min="0" value="${tissue.total}" oninput="updateTissue(${index}, 'total', this.value)" />
+            </div>
+            <div>
+              <label>Prepared</label>
+              <input type="number" min="0" max="${tissue.total}" value="${tissue.prepared}" oninput="updateTissue(${index}, 'prepared', this.value)" />
+            </div>
+            <button class="danger" onclick="removeTissueType(${index})">Remove</button>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-label">
+              <span>${tissue.prepared} / ${tissue.total} prepared</span>
+              <span>${tissuePercent}%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-bar" style="width: ${tissuePercent}%"></div>
+            </div>
+          </div>
+        `;
+        tissueList.appendChild(card);
+      });
+
+      savePlans();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    document.getElementById("planId").addEventListener("input", (event) => {
+      getCurrentPlan().id = event.target.value;
+      savePlans();
+    });
+
+    function updateTissue(index, field, value) {
+      const tissue = getCurrentPlan().tissues[index];
+      if (!tissue) return;
+
+      if (field === "type") {
+        tissue.type = value;
+      } else {
+        tissue[field] = Math.max(0, parseInt(value, 10) || 0);
+        clampPrepared(tissue);
+      }
+
+      render();
+    }
+
+    function addTissueType() {
+      const typeInput = document.getElementById("newTissueType");
+      const totalInput = document.getElementById("newTissueTotal");
+      const preparedInput = document.getElementById("newTissuePrepared");
+
+      const type = typeInput.value.trim();
+      if (!type) return;
+
+      const total = Math.max(0, parseInt(totalInput.value, 10) || 0);
+      const prepared = Math.min(total, Math.max(0, parseInt(preparedInput.value, 10) || 0));
+
+      getCurrentPlan().tissues.push({ type, total, prepared });
+
+      typeInput.value = "";
+      totalInput.value = "";
+      preparedInput.value = "";
+
+      render();
+    }
+
+    function removeTissueType(index) {
+      getCurrentPlan().tissues.splice(index, 1);
+      render();
+    }
+
+    function addPlan() {
+      const input = document.getElementById("newPlanId");
+      const id = input.value.trim();
+      if (!id) return;
+
+      plans.push({ id, tissues: [] });
+      currentIndex = plans.length - 1;
+      input.value = "";
+      render();
+    }
+
+    function nextPlan() {
+      currentIndex = (currentIndex + 1) % plans.length;
+      render();
+    }
+
+    function previousPlan() {
+      currentIndex = (currentIndex - 1 + plans.length) % plans.length;
+      render();
+    }
+
+    function resetData() {
+      const confirmed = confirm("Reset tracker back to demo data? This will remove locally saved changes in this browser.");
+      if (!confirmed) return;
+
+      plans = structuredClone(demoPlans);
+      currentIndex = 0;
+      savePlans();
+      render();
+    }
+
+    function exportData() {
+      const rows = [["Production Plan", "Tissue Type", "Total Samples", "Prepared Samples", "Percent Complete"]];
+
+      plans.forEach((plan) => {
+        plan.tissues.forEach((tissue) => {
+          const percent = tissue.total ? Math.round((tissue.prepared / tissue.total) * 100) : 0;
+          rows.push([plan.id, tissue.type, tissue.total, tissue.prepared, `${percent}%`]);
+        });
+      });
+
+      const csv = rows.map(row => row.map(value => `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "sample-preparation-tracker.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    render();
+  </script>
+</body>
+</html>
