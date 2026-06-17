@@ -1,128 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Sample Preparation Tracker</title>
+
 <style>
-/* Keep all your styles (same as before) */
-body { font-family: Arial; background:#f8fafc; margin:0; }
-.container { max-width:1000px; margin:30px auto; }
-.card { background:white; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.1); }
-.stat { font-size:28px; font-weight:bold; }
-.progress { height:10px; background:#ddd; border-radius:10px; overflow:hidden; }
-.bar { height:100%; background:#2563eb; }
+body {
+  font-family: Arial;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+h1 { margin-top: 0; }
+
+input {
+  padding: 6px;
+  margin: 4px;
+}
+
+button {
+  padding: 6px 10px;
+  margin: 4px;
+  cursor: pointer;
+}
+
+.progress {
+  height: 12px;
+  background: #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  background: green;
+}
+
+.tissue-card {
+  border: 1px solid #ccc;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+}
 </style>
 </head>
 
 <body>
+
 <div class="container">
-  <div class="card">
-    <h2>Sample Preparation Tracker</h2>
+  <h1>Sample Preparation Tracker</h1>
+  <div id="lastUpdated">Loading...</div>
 
-    <div>
-      <strong id="planId"></strong>
-    </div>
+  <h3>Production Plan</h3>
+  <input id="planId"/>
 
-    <div>Total: <span id="total">0</span></div>
-    <div>Prepared: <span id="prepared">0</span></div>
-
-    <div class="progress">
-      <div id="progressBar" class="bar" style="width:0%"></div>
-    </div>
-
-    <div id="tissues"></div>
-
-    <div style="margin-top:10px; font-size:12px; color:gray" id="lastUpdated"></div>
+  <div>
+    <button onclick="prevPlan()">Previous</button>
+    <button onclick="nextPlan()">Next</button>
   </div>
+
+  <h3>Totals</h3>
+  <div>Total: <span id="total">0</span></div>
+  <div>Prepared: <span id="prepared">0</span></div>
+  <div class="progress"><div id="bar" class="bar"></div></div>
+
+  <h3>Tissues</h3>
+  <div id="tissues"></div>
+
+  <h3>Add Tissue</h3>
+  <input id="tType" placeholder="Type"/>
+  <input id="tTotal" type="number" placeholder="Total"/>
+  <input id="tPrep" type="number" placeholder="Prepared"/>
+  <button onclick="addTissue()">Add</button>
+
+  <h3>Add Plan</h3>
+  <input id="newPlan"/>
+  <button onclick="addPlan()">Add Plan</button>
 </div>
 
 <script>
 
-// ✅ ✅ ✅ REPLACE ONLY THIS URL ✅ ✅ ✅
-const DATA_URL = "https://bayergroup.sharepoint.com/sites/RegSciSampleManagementTeam/Shared Documents/General/SampleTrackerData.json";
-
-// store data
 let plans = [];
-let currentIndex = 0;
+let index = 0;
 
-// load JSON from SharePoint
-async function loadData() {
+async function loadFromJSON() {
   try {
-    const response = await fetch(DATA_URL, { cache: "no-store" });
-    const data = await response.json();
+    const res = await fetch("data.json", { cache: "no-store" });
+    if (!res.ok) throw new Error();
 
-    const grouped = {};
-
-    data.forEach(row => {
-      if (!grouped[row.plan]) {
-        grouped[row.plan] = [];
-      }
-
-      grouped[row.plan].push({
-        type: row.tissue,
-        total: row.total,
-        prepared: row.prepared
-      });
-    });
-
-    plans = Object.keys(grouped).map(id => ({
-      id: id,
-      tissues: grouped[id]
-    }));
-
-    currentIndex = 0;
-    render();
-
-    document.getElementById("lastUpdated").innerText =
-      "Last updated: " + new Date().toLocaleString();
-
-  } catch (error) {
-    console.error("Error loading data:", error);
-  }
-}
-
-// render UI
-function render() {
-  if (!plans.length) return;
-
-  const plan = plans[currentIndex];
-
-  let total = 0;
-  let prepared = 0;
-
-  plan.tissues.forEach(t => {
-    total += t.total;
-    prepared += t.prepared;
-  });
-
-  const percent = total ? Math.round((prepared / total) * 100) : 0;
-
-  document.getElementById("planId").innerText = plan.id;
-  document.getElementById("total").innerText = total;
-  document.getElementById("prepared").innerText = prepared;
-  document.getElementById("progressBar").style.width = percent + "%";
-
-  const tissueDiv = document.getElementById("tissues");
-  tissueDiv.innerHTML = "";
-
-  plan.tissues.forEach(t => {
-    const p = t.total ? Math.round((t.prepared / t.total) * 100) : 0;
-
-    tissueDiv.innerHTML += `
-      <div style="margin-top:10px">
-        ${t.type}: ${t.prepared}/${t.total} (${p}%)
-      </div>
-    `;
-  });
-}
-
-// load initially
-loadData();
-
-// auto refresh every 5 min
-setInterval(loadData, 300000);
-
-</script>
-</body>
-</html>
