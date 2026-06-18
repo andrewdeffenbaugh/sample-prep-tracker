@@ -96,6 +96,6 @@ let index = 0;
 
 async function loadFromJSON() {
   try {
-    const res = await fetch("data.json", { cache: "no-store" });
+    const res = await fetch("https://bayergroup.sharepoint.com/sites/RegSciSampleManagementTeam/Shared Documents/General/SampleTrackerData.json", { cache: "no-store" });
     if (!res.ok) throw new Error();
 
